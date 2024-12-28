@@ -8,6 +8,7 @@ pipeline{
                 }
             }
             steps{
+                sh 'echo "From git repo"'
                 sh 'npm --version'
             }
         }
