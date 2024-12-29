@@ -12,11 +12,11 @@ pipeline {
                 sh 'docker build -t my-playwright .'
             }
         }
-        /*
         stage('Build') {
             agent {
                 docker {
-                    image 'node:18-alpine'
+                    //image 'node:18-alpine'
+                    image 'my-playwright'
                     reuseNode true
                 }
             }
@@ -36,7 +36,8 @@ pipeline {
                 stage('Unit Test') {
                     agent {
                         docker {
-                            image 'node:18-alpine'
+                            //image 'node:18-alpine'
+                            image 'my-playwright'
                             reuseNode true
                         }
                     }
@@ -55,14 +56,16 @@ pipeline {
                 stage('E2E') {
                     agent {
                         docker {
-                            image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                            //image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                            image 'my-playwright'
                             reuseNode true
                         }
                     }
                     steps {
                         sh '''
-                            npm install serve
-                            node_modules/.bin/serve -s build &
+                            #npm install serve
+                            #node_modules/.bin/serve -s build &
+                            serve -s build &
                             sleep 10
                             npx playwright test --reporter=html
                         '''
@@ -78,15 +81,16 @@ pipeline {
         stage('Deploy to Staging') {
             agent {
                 docker {
-                    image 'node:18-alpine'
+                    //image 'node:18-alpine'
+                    image 'my-playwright'
                     reuseNode true
                 }
             }
             steps {
                 sh '''
-                    npm install netlify-cli node-jq
-                    node_modules/.bin/netlify --version
-                    node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
+                    #npm install netlify-cli node-jq
+                    #node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
+                    netlify deploy --dir=build --json > deploy-output.json
                 '''
                 script {
                     env.STAGING_URL = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json", returnStdout: true)
@@ -96,7 +100,8 @@ pipeline {
         stage('Staging E2E') {
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    //image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    image 'my-playwright'
                     reuseNode true
                 }
             }
@@ -115,21 +120,24 @@ pipeline {
         stage('Deploy to Prod') {
             agent {
                 docker {
-                    image 'node:18-alpine'
+                    //image 'node:18-alpine'
+                    image 'my-playwright'
                     reuseNode true
                 }
             }
             steps {
                 sh '''
-                    npm install netlify-cli
-                    node_modules/.bin/netlify deploy --dir=build --prod
+                    #npm install netlify-cli
+                    #node_modules/.bin/netlify deploy --dir=build --prod
+                    netlify deploy --dir=build --prod
                 '''
             }
         }
         stage('Prod E2E') {
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    //image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    image 'my-playwright'
                     reuseNode true
                 }
             }
@@ -145,6 +153,5 @@ pipeline {
                 }
             }
         }
-        */
     }
 }
