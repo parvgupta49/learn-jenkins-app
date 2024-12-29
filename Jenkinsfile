@@ -3,7 +3,7 @@ pipeline {
     environment {
         NETLIFY_SITE_ID = '57034658-182e-48a0-8955-ea0b5aee83d9'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
-        REACT_APP_VERSION = "1.0.$BUILD_ID"
+        REACT_APP_VERSION = "1.0.$BUILD_ID" //This will work if apt change done also in src/App.js
     }
 
     stages {
