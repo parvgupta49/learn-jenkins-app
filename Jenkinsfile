@@ -6,6 +6,19 @@ pipeline {
         REACT_APP_VERSION = "1.0.$BUILD_ID" //This will work if apt change done also in src/App.js
     }
     stages {
+        stage('AWS') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    args "entrypoint=''"
+                }
+            }
+            steps {
+                sh '''
+                    aws --version
+                '''
+            }
+        }
         stage('Docker') {
             steps {
                 sh 'docker build -t my-playwright .'
