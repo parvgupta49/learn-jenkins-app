@@ -6,28 +6,6 @@ pipeline {
         REACT_APP_VERSION = "1.0.$BUILD_ID" //This will work if apt change done also in src/App.js
     }
     stages {
-        stage('AWS') {
-            agent {
-                docker {
-                    image 'amazon/aws-cli'
-                    args "--entrypoint=''"
-                    reuseNode true
-                }
-            }
-            environment {
-                AWS_S3_BUCKET = 'paarvbucket'
-            }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'aws-creds', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
-                    sh '''
-                        aws --version
-                        aws s3 ls
-                        echo "Hello s3" > index.html
-                        aws s3 cp index.html s3://$AWS_S3_BUCKET/index.html
-                    '''
-                }
-            }
-        }
         stage('Docker') {
             steps {
                 sh 'docker build -t my-playwright .'
@@ -153,6 +131,29 @@ pipeline {
                     #node_modules/.bin/netlify deploy --dir=build --prod
                     netlify deploy --dir=build --prod
                 '''
+            }
+        }
+        stage('Deploy to AWS') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    args "--entrypoint=''"
+                    reuseNode true
+                }
+            }
+            environment {
+                AWS_S3_BUCKET = 'paarvbucket'
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'aws-creds', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                    sh '''
+                        aws --version
+                        aws s3 ls
+                        echo "Hello s3" > index.html
+                        aws s3 cp index.html s3://$AWS_S3_BUCKET/index.html
+                        aws s3 sync build s3://$AWS_S3_BUCKET
+                    '''
+                }
             }
         }
         stage('Prod E2E') {
