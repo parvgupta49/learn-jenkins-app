@@ -14,12 +14,13 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    image 'python:3-alpine'
+                    image 'ubuntu:noble'
                     args '-u root'
                 }
             }
             steps {
-                sh 'apk add jq'
+                sh 'apt update'
+                sh 'apt install jq -y'
             }
         }
         /*stage('Build') {
