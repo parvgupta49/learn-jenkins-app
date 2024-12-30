@@ -5,7 +5,6 @@ pipeline {
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
         REACT_APP_VERSION = "1.0.$BUILD_ID" //This will work if apt change done also in src/App.js
     }
-
     stages {
         stage('Docker') {
             steps {
@@ -13,6 +12,17 @@ pipeline {
             }
         }
         stage('Build') {
+            agent {
+                docker {
+                    image 'python:3-alpine'
+                    args '-u root'
+                }
+            }
+            steps {
+                sh 'apk add jq'
+            }
+        }
+        /*stage('Build') {
             agent {
                 docker {
                     //image 'node:18-alpine'
@@ -153,6 +163,6 @@ pipeline {
                     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright E2e Prod HTML Report', reportTitles: '', useWrapperFileDirectly: true])
                 }
             }
-        }
+        }*/
     }
 }
