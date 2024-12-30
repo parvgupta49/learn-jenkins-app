@@ -14,18 +14,6 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    image 'ubuntu:noble'
-                    args '-u root'
-                }
-            }
-            steps {
-                sh 'apt update'
-                sh 'apt install jq -y'
-            }
-        }
-        /*stage('Build') {
-            agent {
-                docker {
                     //image 'node:18-alpine'
                     image 'my-playwright'
                     reuseNode true
@@ -164,6 +152,6 @@ pipeline {
                     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright E2e Prod HTML Report', reportTitles: '', useWrapperFileDirectly: true])
                 }
             }
-        }*/
+        }
     }
 }
